@@ -28,7 +28,7 @@ exports.signUp = (req, res) => {
             };
             const authPayload = { _id: user._id };
             const authToken = jwt.sign(authPayload, JWT_SECRET);
-            return res.json({ sucess: true, user: responseUser, authToken });
+            return res.json({ success: true, user: responseUser, authToken });
           })
           .catch((err) => {
             console.log(err);
