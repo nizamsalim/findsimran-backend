@@ -27,8 +27,8 @@ exports.signUp = (req, res) => {
               userName: user.userName,
             };
             const authPayload = { _id: user._id };
-            const authToken = jwt.sign(authPayload, JWT_SECRET);
-            return res.json({ success: true, user: responseUser, authToken });
+            const AuthToken = jwt.sign(authPayload, JWT_SECRET);
+            return res.json({ success: true, user: responseUser, AuthToken });
           })
           .catch((err) => {
             console.log(err);
@@ -64,8 +64,8 @@ exports.login = async (req, res) => {
       userName: user.userName,
     };
     const payload = { _id: user._id };
-    const authToken = jwt.sign(payload, JWT_SECRET);
-    return res.json({ success: true, user: responseUser, authToken });
+    const AuthToken = jwt.sign(payload, JWT_SECRET);
+    return res.json({ success: true, user: responseUser, AuthToken });
   } catch (error) {
     return res
       .status(500)
@@ -73,4 +73,80 @@ exports.login = async (req, res) => {
   }
 };
 
-//Here goes the login controller
+exports.updateUsername = async (req, res) => {
+  try {
+    const { newUsername } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          userName: newUsername,
+        },
+      },
+      { new: true }
+    );
+    let updatedUser = {
+      _id: user._id,
+      name: user.name,
+      userName: user.userName,
+      email: user.email,
+    };
+    res.json({ success: true, updatedUser });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.updateName = async (req, res) => {
+  try {
+    const { newName } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: { name: newName },
+      },
+      { new: true }
+    );
+    let updatedUser = {
+      _id: user._id,
+      name: user.name,
+      userName: user.userName,
+      email: user.email,
+    };
+    res.json({ success: true, updatedUser });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+exports.changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!(newPassword.length > 6)) {
+      return res.status(400).json({
+        success: false,
+        error: "Password should contain more than 6 characters",
+      });
+    }
+    const user = await User.findById(req.user._id);
+    const passwordMatches = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordMatches) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Incorrect password" });
+    }
+    const salt = await bcrypt.genSalt(20);
+    const newPwdHash = await bcrypt.hash(newPassword, salt);
+    await User.findByIdAndUpdate(req.user._id, {
+      $set: { password: newPwdHash },
+    });
+    res.json({ success: true });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
