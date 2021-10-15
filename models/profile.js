@@ -52,13 +52,12 @@ const ProfileSchema = new mongoose.Schema({
     ],
     default:[]
   },
-  socialLinks: [
-    {
+  socialLinks: {
       github: { type: String, required: true },
       linkedin: { type: String, required: true },
       portfolio: String,
     },
-  ],
+  
   preferredLocation:String,
   preferredModeOfWork:{type:String,required:true},
   workingHoursPerDay:{type:Number,required:true},
