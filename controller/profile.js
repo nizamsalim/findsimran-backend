@@ -3,10 +3,11 @@
 //get all the experince stuff and projects and information
 
 const Profile = require("../models/profile");
-const person = require("../models/user");
-exports.createProfile = (req, res) => {
+const User = require("../models/user");
+exports.createProfile = async (req, res) => {
   try {
     const profileValues = {
+      name: null,
       _uid: null,
       socialLinks: {},
       academicDetails: [],
@@ -18,6 +19,8 @@ exports.createProfile = (req, res) => {
       workingHoursPerDay: null,
       expectedWagePerHour: null,
     };
+    const user = await User.findById(req.user._id);
+    profileValues.name = user.name;
     profileValues._uid = req.user._id;
 
     //getting the social links
@@ -67,10 +70,11 @@ exports.createProfile = (req, res) => {
           });
         });
     });
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return res
       .status(500)
-      .json({ success: false, error: "Internal server error" });
+      .json({ success: false, error: "Internal server error", message: err });
   }
 };
 //get the profile using user id
@@ -90,32 +94,33 @@ exports.deleteProfile = (req, res) => {
   });
 };
 
-/*
 //updating profile
-exports.updateProfile=(req,res)=>{
-   const updatedProfile=req.body;
-   Profile.findOne({user:req.user._id})
-   
-   .then(profile=>{
-    if(profile){
-      Profile.findByIdAndUpdate(
-        {user:req.user._id},
-        {$set:updatedProfile},
-        {new:true}
-        )
-        .then(profile=>{
-          res.json(profile);
-        })
-        .catch(err=>{
-          console.log("error in saving the profile by user id"+err);
-        })
-    }else{
-      res.json({success:false,message:"profile is not found to update"})
+exports.updateProfile = (req, res) => {};
+
+// get all profiles for displaying list
+exports.getAllProfiles = async (req, res) => {
+  try {
+    const profiles = await Profile.find({ _uid: { $ne: req.user._id } }).select(
+      "name preferredLocation preferredModeOfWork workingHoursPerDay expectedWagePerHour skills -_id"
+    );
+    if (!profiles) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No profiles found" });
     }
-   })
-   .catch(err=>{
-     console.log("error in updating the profile"+err);
-   })
-        
-}
-*/
+    res.json({ success: true, profiles });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.getUserProfileById = async (req, res) => {
+  const _uid = req.params.uid;
+  const profile = await Profile.findOne({ _uid });
+  if (!profile) {
+    return res.status(404).json({ success: false, error: "Profile not found" });
+  }
+  res.json({ success: true, profile });
+};

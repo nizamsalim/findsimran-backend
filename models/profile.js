@@ -6,6 +6,7 @@ const ProfileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
   },
+  name: String,
   academicDetails: {
     type: [
       {
@@ -29,38 +30,38 @@ const ProfileSchema = new mongoose.Schema({
     ],
     default: [],
   },
-  skills:{
-    type:[
+  skills: {
+    type: [
       {
-        nameOfSkill:{type:String,required:true},
+        nameOfSkill: { type: String, required: true },
         // beginner or intermediate or advanced
-        experienceLevel:{type:String,required:true},
-      }
+        experienceLevel: { type: String, required: true },
+      },
     ],
-    default:[]
+    default: [],
   },
   projects: {
     type: [
       {
         nameOfProject: { type: String, required: true },
-        projectDescription:String,
-        links:{
-          projectGithub:String,
-          hostedLink:String
-        }
+        projectDescription: String,
+        links: {
+          projectGithub: String,
+          hostedLink: String,
+        },
       },
     ],
-    default:[]
+    default: [],
   },
   socialLinks: {
-      github: { type: String, required: true },
-      linkedin: { type: String, required: true },
-      portfolio: String,
-    },
-  
-  preferredLocation:String,
-  preferredModeOfWork:{type:String,required:true},
-  workingHoursPerDay:{type:Number,required:true},
-  expectedWagePerHour:{type:Number,required:true}
+    github: { type: String, required: true },
+    linkedin: { type: String, required: true },
+    portfolio: String,
+  },
+
+  preferredLocation: String,
+  preferredModeOfWork: { type: String, required: true },
+  workingHoursPerDay: { type: Number, required: true },
+  expectedWagePerHour: { type: Number, required: true },
 });
 module.exports = mongoose.model("profile", ProfileSchema);
