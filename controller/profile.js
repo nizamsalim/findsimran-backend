@@ -79,23 +79,118 @@ exports.createProfile = async (req, res) => {
 };
 //get the profile using user id
 exports.getProfile = (req, res) => {
-  Profile.findOne({ _uid: req.user._id }).then((profile) => {
-    if (!profile) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Profile does not exist" });
-    }
-    res.json({ success: true, profile });
-  });
+  try {
+    Profile.findOne({ _uid: req.user._id }).then((profile) => {
+      if (!profile) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Profile does not exist" });
+      }
+      res.json({ success: true, profile });
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
 };
 exports.deleteProfile = (req, res) => {
-  Profile.findOneAndRemove({ _uid: req.user._id }).then(() => {
-    res.json({ success: true });
-  });
+  try {
+    Profile.findOneAndRemove({ _uid: req.user._id }).then(() => {
+      res.json({ success: true });
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
 };
 
 //updating profile
-exports.updateProfile = (req, res) => {};
+exports.updateProfile = async (req, res) => {
+  const profile = await Profile.findOne({ _uid: req.user._id });
+  if (!profile) {
+    return res.status(404).json({
+      success: false,
+      error: "Profile not found, please use create endpoint",
+    });
+  }
+  const updatedValues = req.body;
+  if (updatedValues.academicDetails) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { academicDetails: updatedValues.academicDetails },
+      }
+    );
+  }
+  if (updatedValues.professionalExperience) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { professionalExperience: updatedValues.professionalExperience },
+      }
+    );
+  }
+  if (updatedValues.skills) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { skills: updatedValues.skills },
+      }
+    );
+  }
+  if (updatedValues.projects) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { projects: updatedValues.projects },
+      }
+    );
+  }
+  if (updatedValues.socialLinks) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { socialLinks: updatedValues.socialLinks },
+      }
+    );
+  }
+  if (updatedValues.preferredLocation) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { preferredLocation: updatedValues.preferredLocation },
+      }
+    );
+  }
+  if (updatedValues.preferredModeOfWork) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { preferredModeOfWork: updatedValues.preferredModeOfWork },
+      }
+    );
+  }
+  if (updatedValues.workingHoursPerDay) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { workingHoursPerDay: updatedValues.workingHoursPerDay },
+      }
+    );
+  }
+  if (updatedValues.expectedWagePerHour) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { expectedWagePerHour: updatedValues.expectedWagePerHour },
+      }
+    );
+  }
+  const updatedProfile = await Profile.findOne({ _uid: req.user._id });
+  res.json({ success: true, updatedProfile });
+};
 
 // get all profiles for displaying list
 exports.getAllProfiles = async (req, res) => {
@@ -117,10 +212,17 @@ exports.getAllProfiles = async (req, res) => {
 };
 
 exports.getUserProfileById = async (req, res) => {
-  const _uid = req.params.uid;
-  const profile = await Profile.findOne({ _uid });
-  if (!profile) {
-    return res.status(404).json({ success: false, error: "Profile not found" });
+  try {
+    const profile = await Profile.findOne({ _uid });
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Profile not found" });
+    }
+    res.json({ success: true, profile });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
   }
-  res.json({ success: true, profile });
 };
