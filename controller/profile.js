@@ -3,10 +3,11 @@
 //get all the experince stuff and projects and information
 
 const Profile = require("../models/profile");
-const person = require("../models/user");
-exports.createProfile = (req, res) => {
+const User = require("../models/user");
+exports.createProfile = async (req, res) => {
   try {
     const profileValues = {
+      name: null,
       _uid: null,
       socialLinks: {},
       academicDetails: [],
@@ -18,6 +19,8 @@ exports.createProfile = (req, res) => {
       workingHoursPerDay: null,
       expectedWagePerHour: null,
     };
+    const user = await User.findById(req.user._id);
+    profileValues.name = user.name;
     profileValues._uid = req.user._id;
 
     //getting the social links
@@ -67,55 +70,159 @@ exports.createProfile = (req, res) => {
           });
         });
     });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error", message: err });
+  }
+};
+//get the profile using user id
+exports.getProfile = (req, res) => {
+  try {
+    Profile.findOne({ _uid: req.user._id }).then((profile) => {
+      if (!profile) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Profile does not exist" });
+      }
+      res.json({ success: true, profile });
+    });
   } catch (error) {
     return res
       .status(500)
       .json({ success: false, error: "Internal server error" });
   }
 };
-//get the profile using user id
-exports.getProfile = (req, res) => {
-  Profile.findOne({ _uid: req.user._id }).then((profile) => {
+exports.deleteProfile = (req, res) => {
+  try {
+    Profile.findOneAndRemove({ _uid: req.user._id }).then(() => {
+      res.json({ success: true });
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+//updating profile
+exports.updateProfile = async (req, res) => {
+  const profile = await Profile.findOne({ _uid: req.user._id });
+  if (!profile) {
+    return res.status(404).json({
+      success: false,
+      error: "Profile not found, please use create endpoint",
+    });
+  }
+  const updatedValues = req.body;
+  if (updatedValues.academicDetails) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { academicDetails: updatedValues.academicDetails },
+      }
+    );
+  }
+  if (updatedValues.professionalExperience) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { professionalExperience: updatedValues.professionalExperience },
+      }
+    );
+  }
+  if (updatedValues.skills) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { skills: updatedValues.skills },
+      }
+    );
+  }
+  if (updatedValues.projects) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { projects: updatedValues.projects },
+      }
+    );
+  }
+  if (updatedValues.socialLinks) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { socialLinks: updatedValues.socialLinks },
+      }
+    );
+  }
+  if (updatedValues.preferredLocation) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { preferredLocation: updatedValues.preferredLocation },
+      }
+    );
+  }
+  if (updatedValues.preferredModeOfWork) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { preferredModeOfWork: updatedValues.preferredModeOfWork },
+      }
+    );
+  }
+  if (updatedValues.workingHoursPerDay) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { workingHoursPerDay: updatedValues.workingHoursPerDay },
+      }
+    );
+  }
+  if (updatedValues.expectedWagePerHour) {
+    await Profile.findOneAndUpdate(
+      { _uid: req.user._id },
+      {
+        $set: { expectedWagePerHour: updatedValues.expectedWagePerHour },
+      }
+    );
+  }
+  const updatedProfile = await Profile.findOne({ _uid: req.user._id });
+  res.json({ success: true, updatedProfile });
+};
+
+// get all profiles for displaying list
+exports.getAllProfiles = async (req, res) => {
+  try {
+    const profiles = await Profile.find({ _uid: { $ne: req.user._id } }).select(
+      "name preferredLocation preferredModeOfWork workingHoursPerDay expectedWagePerHour skills -_id"
+    );
+    if (!profiles) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No profiles found" });
+    }
+    res.json({ success: true, profiles });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.getUserProfileById = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ _uid });
     if (!profile) {
       return res
         .status(404)
-        .json({ success: false, error: "Profile does not exist" });
+        .json({ success: false, error: "Profile not found" });
     }
     res.json({ success: true, profile });
-  });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
 };
-exports.deleteProfile = (req, res) => {
-  Profile.findOneAndRemove({ _uid: req.user._id }).then(() => {
-    res.json({ success: true });
-  });
-};
-
-/*
-//updating profile
-exports.updateProfile=(req,res)=>{
-   const updatedProfile=req.body;
-   Profile.findOne({user:req.user._id})
-   
-   .then(profile=>{
-    if(profile){
-      Profile.findByIdAndUpdate(
-        {user:req.user._id},
-        {$set:updatedProfile},
-        {new:true}
-        )
-        .then(profile=>{
-          res.json(profile);
-        })
-        .catch(err=>{
-          console.log("error in saving the profile by user id"+err);
-        })
-    }else{
-      res.json({success:false,message:"profile is not found to update"})
-    }
-   })
-   .catch(err=>{
-     console.log("error in updating the profile"+err);
-   })
-        
-}
-*/
