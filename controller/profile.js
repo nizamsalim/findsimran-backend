@@ -74,7 +74,7 @@ exports.createProfile = async (req, res) => {
     console.log(err);
     return res
       .status(500)
-      .json({ success: false, error: "Internal server error", message: err });
+      .json({ success: false, error: "Internal server error" });
   }
 };
 //get the profile using user id
@@ -108,88 +108,96 @@ exports.deleteProfile = (req, res) => {
 
 //updating profile
 exports.updateProfile = async (req, res) => {
-  const profile = await Profile.findOne({ _uid: req.user._id });
-  if (!profile) {
-    return res.status(404).json({
-      success: false,
-      error: "Profile not found, please use create endpoint",
-    });
+  try {
+    const profile = await Profile.findOne({ _uid: req.user._id });
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        error: "Profile not found, please use create endpoint",
+      });
+    }
+    const updatedValues = req.body;
+    if (updatedValues.academicDetails) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { academicDetails: updatedValues.academicDetails },
+        }
+      );
+    }
+    if (updatedValues.professionalExperience) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: {
+            professionalExperience: updatedValues.professionalExperience,
+          },
+        }
+      );
+    }
+    if (updatedValues.skills) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { skills: updatedValues.skills },
+        }
+      );
+    }
+    if (updatedValues.projects) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { projects: updatedValues.projects },
+        }
+      );
+    }
+    if (updatedValues.socialLinks) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { socialLinks: updatedValues.socialLinks },
+        }
+      );
+    }
+    if (updatedValues.preferredLocation) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { preferredLocation: updatedValues.preferredLocation },
+        }
+      );
+    }
+    if (updatedValues.preferredModeOfWork) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { preferredModeOfWork: updatedValues.preferredModeOfWork },
+        }
+      );
+    }
+    if (updatedValues.workingHoursPerDay) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { workingHoursPerDay: updatedValues.workingHoursPerDay },
+        }
+      );
+    }
+    if (updatedValues.expectedWagePerHour) {
+      await Profile.findOneAndUpdate(
+        { _uid: req.user._id },
+        {
+          $set: { expectedWagePerHour: updatedValues.expectedWagePerHour },
+        }
+      );
+    }
+    const updatedProfile = await Profile.findOne({ _uid: req.user._id });
+    res.json({ success: true, updatedProfile });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
   }
-  const updatedValues = req.body;
-  if (updatedValues.academicDetails) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { academicDetails: updatedValues.academicDetails },
-      }
-    );
-  }
-  if (updatedValues.professionalExperience) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { professionalExperience: updatedValues.professionalExperience },
-      }
-    );
-  }
-  if (updatedValues.skills) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { skills: updatedValues.skills },
-      }
-    );
-  }
-  if (updatedValues.projects) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { projects: updatedValues.projects },
-      }
-    );
-  }
-  if (updatedValues.socialLinks) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { socialLinks: updatedValues.socialLinks },
-      }
-    );
-  }
-  if (updatedValues.preferredLocation) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { preferredLocation: updatedValues.preferredLocation },
-      }
-    );
-  }
-  if (updatedValues.preferredModeOfWork) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { preferredModeOfWork: updatedValues.preferredModeOfWork },
-      }
-    );
-  }
-  if (updatedValues.workingHoursPerDay) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { workingHoursPerDay: updatedValues.workingHoursPerDay },
-      }
-    );
-  }
-  if (updatedValues.expectedWagePerHour) {
-    await Profile.findOneAndUpdate(
-      { _uid: req.user._id },
-      {
-        $set: { expectedWagePerHour: updatedValues.expectedWagePerHour },
-      }
-    );
-  }
-  const updatedProfile = await Profile.findOne({ _uid: req.user._id });
-  res.json({ success: true, updatedProfile });
 };
 
 // get all profiles for displaying list
@@ -198,6 +206,7 @@ exports.getAllProfiles = async (req, res) => {
     const profiles = await Profile.find({ _uid: { $ne: req.user._id } }).select(
       "name preferredLocation preferredModeOfWork workingHoursPerDay expectedWagePerHour skills -_id"
     );
+    console.log(profiles);
     if (!profiles) {
       return res
         .status(404)
