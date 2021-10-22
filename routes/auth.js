@@ -9,6 +9,7 @@ const {
   updateUsername,
   updateName,
   changePassword,
+  getCurrentUserDetails,
 } = require("../controller/auth");
 const validateSignup = require("../middleware/validation");
 const getUserFromAuthToken = require("../middleware/getUser");
@@ -33,5 +34,7 @@ router.post("/updatename", getUserFromAuthToken, updateName);
 // POST /api/auth/name
 router.post("/changepassword", getUserFromAuthToken, changePassword);
 
-//Here goes the router for sign out
+// GET CURRENT USER DETAILS ENDPOINT
+// POST /api/auth/getcurrentuser
+router.get("/getcurrentuser", getUserFromAuthToken, getCurrentUserDetails);
 module.exports = router;

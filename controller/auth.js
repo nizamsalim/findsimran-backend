@@ -76,6 +76,11 @@ exports.login = async (req, res) => {
 exports.updateUsername = async (req, res) => {
   try {
     const { newUsername } = req.body;
+    if (!newUsername)
+      return res.status(400).json({
+        success: false,
+        error: "New username not present in request body",
+      });
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -102,6 +107,11 @@ exports.updateUsername = async (req, res) => {
 exports.updateName = async (req, res) => {
   try {
     const { newName } = req.body;
+    if (!newName)
+      return res.status(400).json({
+        success: false,
+        error: "New name not present in request body",
+      });
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -131,6 +141,12 @@ exports.changePassword = async (req, res) => {
         error: "Password should contain more than 6 characters",
       });
     }
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: "New username not present in request body",
+      });
+    }
     const user = await User.findById(req.user._id);
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatches) {
@@ -145,6 +161,21 @@ exports.changePassword = async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.getCurrentUserDetails = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+    res.json({ success: true, user });
+  } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, error: "Internal server error" });
