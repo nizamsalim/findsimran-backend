@@ -17,28 +17,29 @@ exports.signUp = (req, res) => {
         //store hash in your DB
         newUser.password = hash;
 
-        newUser
-          .save()
-          .then((user) => {
-            const responseUser = {
-              name: user.name,
-              email: user.email,
-              id: user._id,
-              userName: user.userName,
-            };
-            const authPayload = { _id: user._id };
-            const AuthToken = jwt.sign(authPayload, JWT_SECRET);
-            return res.json({ success: true, user: responseUser, AuthToken });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        newUser.save().then((user) => {
+          const responseUser = {
+            name: user.name,
+            email: user.email,
+            _id: user._id,
+            userName: user.userName,
+          };
+          const authPayload = { _id: user._id };
+          const AuthToken = jwt.sign(authPayload, JWT_SECRET);
+          return res.json({ success: true, user: responseUser, AuthToken });
+        });
       });
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message:
+          "Internal server error. Contact backend team with code AUTH-SU",
+        body: req.body,
+      },
+    });
   }
 };
 
@@ -47,29 +48,42 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Email does not exist" });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: "auth/em-inc",
+          message: "Email does not exist",
+        },
+      });
     }
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Password is incorrect" });
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: "auth/pwd-inc",
+          message: "Password is incorrect",
+        },
+      });
     }
     const responseUser = {
       name: user.name,
       email: user.email,
-      id: user._id,
+      _id: user._id,
       userName: user.userName,
     };
     const payload = { _id: user._id };
     const AuthToken = jwt.sign(payload, JWT_SECRET);
     return res.json({ success: true, user: responseUser, AuthToken });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code AU-LG",
+        body: req.body,
+      },
+    });
   }
 };
 
@@ -79,7 +93,10 @@ exports.updateUsername = async (req, res) => {
     if (!newUsername)
       return res.status(400).json({
         success: false,
-        error: "New username not present in request body",
+        error: {
+          code: "user/unm-abs",
+          message: "New username is not present in request body",
+        },
       });
     const user = await User.findByIdAndUpdate(
       req.user._id,
@@ -98,9 +115,14 @@ exports.updateUsername = async (req, res) => {
     };
     res.json({ success: true, updatedUser });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code UP-UNM",
+        body: req.body,
+      },
+    });
   }
 };
 
@@ -110,7 +132,10 @@ exports.updateName = async (req, res) => {
     if (!newName)
       return res.status(400).json({
         success: false,
-        error: "New name not present in request body",
+        error: {
+          code: "user/nm-abs",
+          message: "New name is not present in request body",
+        },
       });
     const user = await User.findByIdAndUpdate(
       req.user._id,
@@ -127,9 +152,14 @@ exports.updateName = async (req, res) => {
     };
     res.json({ success: true, updatedUser });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code UP-NM",
+        body: req.body,
+      },
+    });
   }
 };
 exports.changePassword = async (req, res) => {
@@ -138,21 +168,31 @@ exports.changePassword = async (req, res) => {
     if (!(newPassword.length > 6)) {
       return res.status(400).json({
         success: false,
-        error: "Password should contain more than 6 characters",
+        error: {
+          code: "val/pwd-len",
+          message: "Password should be more than 6 characters long",
+        },
       });
     }
     if (!oldPassword || !newPassword) {
       return res.status(400).json({
         success: false,
-        error: "New username not present in request body",
+        error: {
+          code: "auth/pwd-abs",
+          message: "Old password or new password missing in request body",
+        },
       });
     }
     const user = await User.findById(req.user._id);
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatches) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Incorrect password" });
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: "auth/pwd-inc",
+          message: "Password is incorrect",
+        },
+      });
     }
     const salt = await bcrypt.genSalt(20);
     const newPwdHash = await bcrypt.hash(newPassword, salt);
@@ -161,9 +201,15 @@ exports.changePassword = async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message:
+          "Internal server error. Contact backend team with code AU-PWDCH",
+        body: req.body,
+      },
+    });
   }
 };
 
@@ -171,13 +217,24 @@ exports.getCurrentUserDetails = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: "user/nf",
+          message: "User not found",
+        },
+      });
     }
     res.json({ success: true, user });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message:
+          "Internal server error. Contact backend team with code AU-CUSD",
+        body: req.body,
+      },
+    });
   }
 };
