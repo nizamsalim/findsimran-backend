@@ -1,5 +1,7 @@
 # <span id="docs"> **FIND SIMRAN API DOCUMENTATION**</span>
 
+## Base URL - https://findsimran-backend.herokuapp.com
+
 ## **List of All Endpoints**
 
 | Name                                                     | Method | Endpoint                             |
