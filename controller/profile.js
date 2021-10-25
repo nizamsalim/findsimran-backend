@@ -53,7 +53,7 @@ exports.createProfile = async (req, res) => {
     //Database Stuff
     Profile.findOne({ _uid: req.user._id }).then((profile) => {
       if (profile) {
-        return res.status(400).json({
+        return res.json({
           success: false,
           error: {
             code: "profile/ex",
@@ -67,7 +67,7 @@ exports.createProfile = async (req, res) => {
           res.json({ success: true, newProfile });
         })
         .catch((err) => {
-          res.status(400).json({
+          res.json({
             success: false,
             error: {
               code: "profile/ref-doc",
@@ -77,7 +77,7 @@ exports.createProfile = async (req, res) => {
         });
     });
   } catch (err) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -91,7 +91,7 @@ exports.getProfile = (req, res) => {
   try {
     Profile.findOne({ _uid: req.user._id }).then((profile) => {
       if (!profile) {
-        return res.status(404).json({
+        return res.json({
           success: false,
           error: {
             code: "profile/nf",
@@ -102,7 +102,7 @@ exports.getProfile = (req, res) => {
       res.json({ success: true, profile });
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -117,7 +117,7 @@ exports.deleteProfile = (req, res) => {
       res.json({ success: true });
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -132,7 +132,7 @@ exports.updateProfile = async (req, res) => {
   try {
     const profile = await Profile.findOne({ _uid: req.user._id });
     if (!profile) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         error: {
           code: "profile/nf",
@@ -218,7 +218,7 @@ exports.updateProfile = async (req, res) => {
     const updatedProfile = await Profile.findOne({ _uid: req.user._id });
     res.json({ success: true, updatedProfile });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -236,7 +236,7 @@ exports.getAllProfiles = async (req, res) => {
     );
     console.log(profiles);
     if (!profiles) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         error: {
           code: "profile/emp",
@@ -246,7 +246,7 @@ exports.getAllProfiles = async (req, res) => {
     }
     res.json({ success: true, profiles });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -260,7 +260,7 @@ exports.getUserProfileById = async (req, res) => {
   try {
     const profile = await Profile.findOne({ _uid });
     if (!profile) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         error: {
           code: "profile/nf",
@@ -270,7 +270,7 @@ exports.getUserProfileById = async (req, res) => {
     }
     res.json({ success: true, profile });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
