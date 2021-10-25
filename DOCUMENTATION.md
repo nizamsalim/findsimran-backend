@@ -1,4 +1,4 @@
-# **FIND SIMRAN API DOCUMENTATION**
+# <span id="docs"> **FIND SIMRAN API DOCUMENTATION**</span>
 
 ## **List of All Endpoints**
 
@@ -52,7 +52,7 @@ POST `/api/auth/signup`
     "id": "615efda38ee4fd4ae29eff9e",
     "userName": "jo_do@123"
   },
-  "authToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
+  "AuthToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
 }
 ```
 
@@ -61,7 +61,10 @@ POST `/api/auth/signup`
 ```json
 {
   "success": false,
-  "error": "error message..."
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -93,7 +96,7 @@ POST `/api/auth/login`
     "id": "615efda38ee4fd4ae29eff9e",
     "userName": "jo_do@123"
   },
-  "authToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
+  "AuthToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
 }
 ```
 
@@ -102,7 +105,10 @@ POST `/api/auth/login`
 ```json
 {
   "success": false,
-  "error": "error message..."
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -121,7 +127,10 @@ Key : "AuthToken"
 ```json
 {
   "success": false,
-  "error": "AuthToken not present in headers"
+  "error": {
+    "code": "auth/tkn-abs",
+    "message": "AuthToken not present in headers"
+  }
 }
 ```
 
@@ -130,7 +139,10 @@ Key : "AuthToken"
 ```json
 {
   "success": false,
-  "error": "Authorisation failed - Access denied"
+  "error": {
+    "code": "auth/tkn-inc",
+    "message": "Authorisation failed - Access denied"
+  }
 }
 ```
 
@@ -167,7 +179,10 @@ POST `/api/auth/updatename`
 ```json
 {
   "success": false,
-  "error": "error message..."
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -206,7 +221,10 @@ POST `/api/auth/updateusername`
 ```json
 {
   "success": false,
-  "error": "error message..."
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -240,7 +258,10 @@ POST `/api/auth/changepassword`
 ```json
 {
   "success": false,
-  "error": "error message..."
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -262,6 +283,18 @@ GET `/api/auth/getcurrentuser`
     "name": "John Doe",
     "userName": "jo_do",
     "email": "jd@gm.com"
+  }
+}
+```
+
+### Failure response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "...",
+    "message": "..."
   }
 }
 ```
@@ -545,7 +578,10 @@ type : String
 ```json
 {
   "success": false,
-  "error": "Error message"
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -638,7 +674,10 @@ To update preferred location from Kochi to Bangalore and increase wage per hour 
 ```json
 {
   "success": false,
-  "error": "Error message"
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -730,7 +769,10 @@ _Used for getting profile details of currently logged in user_
 ```json
 {
   "success": false,
-  "error": "Error message"
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -755,11 +797,14 @@ DELETE `/api/profile/deleteProfile`
 ```json
 {
   "success": false,
-  "error": "Error message"
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
-\*Refer errors for more information
+\*Refer <a href="#errors"> errors </a> for more information
 
 ---
 
@@ -827,7 +872,10 @@ Information present :
 ```json
 {
   "success": false,
-  "error": "Error message"
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
 }
 ```
 
@@ -910,3 +958,59 @@ Not applicable for current user. For current user profile click <a href="#get">h
   }
 }
 ```
+
+### Failure response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
+}
+```
+
+---
+
+---
+
+# <span id="errors"> Error Codes </span>
+
+\*More information in the error object
+
+## General
+
+| Error Code   | Description                                 |
+| ------------ | ------------------------------------------- |
+| `server/ise` | Internal server error. Contact backend team |
+
+## Authentication input validation
+
+| Error Code     | Description                       |
+| -------------- | --------------------------------- |
+| `val/inp-inv ` | Invalid inputs for authentication |
+| `val/un-tkn `  | Username already taken            |
+| `val/em-ex `   | Email already exists              |
+| `val/em-inv `  | Invalid email                     |
+| `val/pwd-len ` | Password length not sufficient    |
+
+## Authentication
+
+| Error Code     | Description                 |
+| -------------- | --------------------------- |
+| `auth/em-inc`  | Incorrect email             |
+| `auth/pwd-inc` | Incorrect password          |
+| `auth/pwd-abs` | Password missing            |
+| `user/unm-abs` | New username absent in body |
+| `user/nm-abs`  | New name absent in body     |
+| `user/nf`      | User not found              |
+
+## Profile
+
+| Error Code        | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| `profile/ex`      | Profile already exists                           |
+| `profile/ref-doc` | Invalid input. Refer <a href="#docs" > docs </a> |
+| `profile/nf`      | Profile not found                                |
+| `profile/emp`     | No profiles found                                |

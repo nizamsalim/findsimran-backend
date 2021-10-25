@@ -55,7 +55,11 @@ exports.createProfile = async (req, res) => {
       if (profile) {
         return res.status(400).json({
           success: false,
-          error: "Profile already exists. Please use updateProfile endpoint",
+          error: {
+            code: "profile/ex",
+            message:
+              "Profile already exists. Please use update profile endpoint",
+          },
         });
       }
       Profile.create(profileValues)
@@ -63,18 +67,23 @@ exports.createProfile = async (req, res) => {
           res.json({ success: true, newProfile });
         })
         .catch((err) => {
-          console.log(err);
           res.status(400).json({
             success: false,
-            error: "Please refer documentation and pass appropriate values",
+            error: {
+              code: "profile/ref-doc",
+              message: "Please refer documentation and pass appropriate values",
+            },
           });
         });
     });
   } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code PR-CRT",
+      },
+    });
   }
 };
 //get the profile using user id
@@ -82,16 +91,24 @@ exports.getProfile = (req, res) => {
   try {
     Profile.findOne({ _uid: req.user._id }).then((profile) => {
       if (!profile) {
-        return res
-          .status(404)
-          .json({ success: false, error: "Profile does not exist" });
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: "profile/nf",
+            message: "Profile not found",
+          },
+        });
       }
       res.json({ success: true, profile });
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code PR-GT",
+      },
+    });
   }
 };
 exports.deleteProfile = (req, res) => {
@@ -100,9 +117,13 @@ exports.deleteProfile = (req, res) => {
       res.json({ success: true });
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code PR-DL",
+      },
+    });
   }
 };
 
@@ -113,7 +134,10 @@ exports.updateProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        error: "Profile not found, please use create endpoint",
+        error: {
+          code: "profile/nf",
+          message: "Profile not found, please use create endpoint",
+        },
       });
     }
     const updatedValues = req.body;
@@ -194,9 +218,13 @@ exports.updateProfile = async (req, res) => {
     const updatedProfile = await Profile.findOne({ _uid: req.user._id });
     res.json({ success: true, updatedProfile });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code PR-UPD",
+      },
+    });
   }
 };
 
@@ -208,15 +236,23 @@ exports.getAllProfiles = async (req, res) => {
     );
     console.log(profiles);
     if (!profiles) {
-      return res
-        .status(404)
-        .json({ success: false, error: "No profiles found" });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: "profile/emp",
+          message: "No profiles found",
+        },
+      });
     }
     res.json({ success: true, profiles });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message: "Internal server error. Contact backend team with code PR-GTA",
+      },
+    });
   }
 };
 
@@ -224,14 +260,23 @@ exports.getUserProfileById = async (req, res) => {
   try {
     const profile = await Profile.findOne({ _uid });
     if (!profile) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Profile not found" });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: "profile/nf",
+          message: "Profile not found",
+        },
+      });
     }
     res.json({ success: true, profile });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: "server/ise",
+        message:
+          "Internal server error. Contact backend team with code PR-GTUPID",
+      },
+    });
   }
 };
