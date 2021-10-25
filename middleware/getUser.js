@@ -5,7 +5,7 @@ const fetchUserFromAuthToken = async (req, res, next) => {
   try {
     const AuthToken = req.header("AuthToken");
     if (!AuthToken) {
-      return res.status(401).json({
+      return res.json({
         success: false,
         error: {
           code: "auth/tkn-abs",
@@ -17,7 +17,7 @@ const fetchUserFromAuthToken = async (req, res, next) => {
     req.user = payload;
     next();
   } catch (error) {
-    return res.status(403).json({
+    return res.json({
       success: false,
       error: {
         code: "auth/tkn-inc",

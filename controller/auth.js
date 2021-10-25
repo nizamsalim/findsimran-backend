@@ -31,7 +31,7 @@ exports.signUp = (req, res) => {
       });
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         error: {
           code: "auth/em-inc",
@@ -58,7 +58,7 @@ exports.login = async (req, res) => {
     }
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "auth/pwd-inc",
@@ -76,7 +76,7 @@ exports.login = async (req, res) => {
     const AuthToken = jwt.sign(payload, JWT_SECRET);
     return res.json({ success: true, user: responseUser, AuthToken });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -91,7 +91,7 @@ exports.updateUsername = async (req, res) => {
   try {
     const { newUsername } = req.body;
     if (!newUsername)
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "user/unm-abs",
@@ -115,7 +115,7 @@ exports.updateUsername = async (req, res) => {
     };
     res.json({ success: true, updatedUser });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -130,7 +130,7 @@ exports.updateName = async (req, res) => {
   try {
     const { newName } = req.body;
     if (!newName)
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "user/nm-abs",
@@ -152,7 +152,7 @@ exports.updateName = async (req, res) => {
     };
     res.json({ success: true, updatedUser });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -166,7 +166,7 @@ exports.changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     if (!(newPassword.length > 6)) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/pwd-len",
@@ -175,7 +175,7 @@ exports.changePassword = async (req, res) => {
       });
     }
     if (!oldPassword || !newPassword) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "auth/pwd-abs",
@@ -186,7 +186,7 @@ exports.changePassword = async (req, res) => {
     const user = await User.findById(req.user._id);
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatches) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "auth/pwd-inc",
@@ -201,7 +201,7 @@ exports.changePassword = async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
@@ -217,7 +217,7 @@ exports.getCurrentUserDetails = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         error: {
           code: "user/nf",
@@ -227,7 +227,7 @@ exports.getCurrentUserDetails = async (req, res) => {
     }
     res.json({ success: true, user });
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",

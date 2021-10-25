@@ -4,7 +4,7 @@ const validateSignup = async (req, res, next) => {
   try {
     const { name, userName, email, password } = req.body;
     if (!name || !userName || !email || !password) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/inp-inv",
@@ -25,7 +25,7 @@ const validateSignup = async (req, res, next) => {
       return re.test(String(emailInput).toLowerCase());
     }
     if (usernameExists) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/un-tkn",
@@ -34,7 +34,7 @@ const validateSignup = async (req, res, next) => {
       });
     }
     if (emailExists) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/em-ex",
@@ -43,7 +43,7 @@ const validateSignup = async (req, res, next) => {
       });
     }
     if (!emailIsValid) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/em-inv",
@@ -52,7 +52,7 @@ const validateSignup = async (req, res, next) => {
       });
     }
     if (!passwordIsValid) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         error: {
           code: "val/pwd-len",
@@ -62,7 +62,7 @@ const validateSignup = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: {
         code: "server/ise",
