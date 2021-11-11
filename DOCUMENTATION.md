@@ -9,6 +9,7 @@
 | <a href="#authentication"> **Authentication**            |        |                                      |
 | <a  href="#signup" >Signup</a>                           |  POST  | /api/auth/signup                     |
 | <a  href="#login" >Login</a>                             |  POST  | /api/auth/login                      |
+| <a  href="#googlelogin" >Google Login</a>                |  POST  | /api/auth/googlelogin                |
 | <a  href="#updatename" >Update name</a>                  |  POST  | /api/auth/updatename                 |
 | <a  href="#updateusername" >Update Username</a>          |  POST  | /api/auth/updateusername             |
 | <a  href="#changepassword" >Change password</a>          |  POST  | /api/auth/changepassword             |
@@ -51,7 +52,7 @@ POST `/api/auth/signup`
   "user": {
     "name": "John Doe",
     "email": "jdoe@gm.com",
-    "id": "615efda38ee4fd4ae29eff9e",
+    "_id": "615efda38ee4fd4ae29eff9e",
     "userName": "jo_do@123"
   },
   "AuthToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
@@ -95,7 +96,7 @@ POST `/api/auth/login`
   "user": {
     "name": "John Doe",
     "email": "jdoe@gm.com",
-    "id": "615efda38ee4fd4ae29eff9e",
+    "_id": "615efda38ee4fd4ae29eff9e",
     "userName": "jo_do@123"
   },
   "AuthToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
@@ -115,6 +116,49 @@ POST `/api/auth/login`
 ```
 
 \*Refer <a href="#errors"> errors </a> for more information
+
+---
+
+## <span id="googlelogin">**GOOGLE LOGIN**</span>
+
+POST `/api/auth/googlelogin`  
+_Google login integration is done with firebase_  
+_Sign in with google on frontend using firebase and pass the idToken recieved to the backend_ (Visit firebase docs for more info)
+
+### Input Data
+
+```json
+{
+  "idToken": "..."
+}
+```
+
+### Success response
+
+```json
+{
+  "success": true,
+  "user": {
+    "name": "John Doe",
+    "email": "jdoe@gmail.com",
+    "_id": "615efda38ee4fd4ae29eff9e",
+    "userName": "jdoe"
+  },
+  "AuthToken": "eyJhbGciOiJIUzI1NiIsInR5cC..."
+}
+```
+
+### Failure response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "...",
+    "message": "..."
+  }
+}
+```
 
 ---
 
@@ -999,20 +1043,21 @@ Not applicable for current user. For current user profile click <a href="#get">h
 
 ## Authentication
 
-| Error Code     | Description                 |
-| -------------- | --------------------------- |
-| `auth/em-inc`  | Incorrect email             |
-| `auth/pwd-inc` | Incorrect password          |
-| `auth/pwd-abs` | Password missing            |
-| `user/unm-abs` | New username absent in body |
-| `user/nm-abs`  | New name absent in body     |
-| `user/nf`      | User not found              |
+| Error Code     | Description                      |
+| -------------- | -------------------------------- |
+| `auth/em-inc`  | Incorrect email                  |
+| `auth/pwd-inc` | Incorrect password               |
+| `auth/pwd-abs` | Password missing                 |
+| `auth/id-abs`  | idToken missing (google sign in) |
+| `user/unm-abs` | New username absent in body      |
+| `user/nm-abs`  | New name absent in body          |
+| `user/nf`      | User not found                   |
 
 ## Profile
 
-| Error Code        | Description                                      |
-| ----------------- | ------------------------------------------------ |
-| `profile/ex`      | Profile already exists                           |
-| `profile/ref-doc` | Invalid input. Refer <a href="#docs" > docs </a> |
-| `profile/nf`      | Profile not found                                |
-| `profile/emp`     | No profiles found                                |
+| Error Code        | Description                                        |
+| ----------------- | -------------------------------------------------- |
+| `profile/ex`      | Profile already exists                             |
+| `profile/ref-doc` | Invalid input. Refer <a href="#create" > docs </a> |
+| `profile/nf`      | Profile not found                                  |
+| `profile/emp`     | No profiles found                                  |
