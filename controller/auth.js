@@ -1,7 +1,9 @@
 const User = require("../models/user");
+const GoogleUser = require("../models/googleUser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const admin = require("firebase-admin");
 
 exports.signUp = (req, res) => {
   try {
@@ -84,6 +86,66 @@ exports.login = async (req, res) => {
         body: req.body,
       },
     });
+  }
+};
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const getUsernameFromEmail = (email) => {
+      let username = email.split("@")[0];
+      username = username.split(".").join("");
+      return username;
+    };
+    if (!req.body.idToken) {
+      return res.json({
+        success: false,
+        error: {
+          code: "auth/id-abs",
+          message: "id Token is not present in request body",
+        },
+      });
+    }
+
+    let response = {
+      success: true,
+      user: {},
+      AuthToken: null,
+    };
+
+    const gUser = await admin.auth().verifyIdToken(req.body.idToken);
+    const { name, picture, email } = gUser;
+    const userExistsInDb = await GoogleUser.findOne({ email });
+    if (userExistsInDb) {
+      const authPayload = {
+        _id: userExistsInDb._id,
+      };
+      const AuthToken = jwt.sign(authPayload, JWT_SECRET);
+      response.user = userExistsInDb;
+      response.AuthToken = AuthToken;
+    } else {
+      const user = await GoogleUser.create({
+        name,
+        profilePic: picture,
+        email,
+        userName: getUsernameFromEmail(email),
+      });
+      const authPayload = { _id: user._id };
+      const AuthToken = jwt.sign(authPayload, JWT_SECRET);
+      response.user = user;
+      response.AuthToken = AuthToken;
+    }
+    res.json(response);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error: {
+          code: "server/ise",
+          message:
+            "Internal server error. Contact backend team with code AU-GL",
+        },
+      });
   }
 };
 

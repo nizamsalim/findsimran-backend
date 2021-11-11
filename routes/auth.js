@@ -10,6 +10,7 @@ const {
   updateName,
   changePassword,
   getCurrentUserDetails,
+  googleLogin,
 } = require("../controller/auth");
 const validateSignup = require("../middleware/validation");
 const getUserFromAuthToken = require("../middleware/getUser");
@@ -21,6 +22,10 @@ router.post("/signup", validateSignup, signUp);
 // LOGIN ENDPOINT
 // POST /api/auth/login
 router.post("/login", login);
+
+// GOOGLE LOGIN ENDPOINT
+// POST /api/auth/googlelogin
+router.post("/googlelogin", googleLogin);
 
 // UPDATE USERNAME ENDPOINT
 // POST /api/auth/updateusername

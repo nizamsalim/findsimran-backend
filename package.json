@@ -1,11 +1,11 @@
 {
   "name": "findsimran-backend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "devStart": "nodemon index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "express-handlebars": "^5.3.4",
     "express-jwt": "^6.1.0",
     "express-validator": "^6.12.2",
+    "firebase-admin": "^10.0.0",
     "hbs": "^4.1.2",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.1.2",
@@ -36,6 +37,7 @@
     "nodemon": "^2.0.13"
   },
   "engines": {
-    "node": "14.16.0"
+    "node": "14.16.0",
+    "npm":"6.14.11"
   }
 }

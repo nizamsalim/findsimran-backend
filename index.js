@@ -3,7 +3,8 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const PORT = process.env.PORT;
-const { connect } = require("./dbConfig");
+const { connect } = require("./config/dbConfig");
+const { connectFirebase } = require("./config/firebaseConfig");
 const path = require("path");
 const hbs = require("express-handlebars");
 
@@ -13,9 +14,15 @@ const profileRoutes = require("./routes/profile");
 
 // database connection
 connect();
+// firebase connection
+connectFirebase();
 
 // middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 //routes
 app.use("/api/auth", authRoutes);
